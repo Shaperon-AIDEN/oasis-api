@@ -12,7 +12,7 @@ OASIS_DB_PATH = os.environ.get("OASIS_DB_PATH", "data/OASis_9mers_v1.db")
 
 class PeptideRequest(BaseModel):
     peptides: List[str]
-    filter_chain: str = None  # "Heavy" or "Light", optional
+    chain_type: str = None  # "Heavy" or "Light", optional (matches humanness.py)
 
 class PeptideResponse(BaseModel):
     num_total_oas_subjects: int
@@ -29,13 +29,14 @@ def check_peptides(request: PeptideRequest):
     if not request.peptides:
         return {"num_total_oas_subjects": 0, "hits": []}
     
-    # 1. Get total number of subjects based on chain filter (matches logic in humanness.py)
+    # 1. Get total number of subjects based on chain type filter (matches logic in humanness.py)
     filter_chain_statement = ""
-    if request.filter_chain:
-        if request.filter_chain not in ['Heavy', 'Light']:
-            raise HTTPException(status_code=400, detail="filter_chain must be 'Heavy' or 'Light'")
-        filter_chain_statement = f"AND Complete{request.filter_chain}Seqs >= 10000"
-        count_query = f"SELECT COUNT(*) FROM subjects WHERE Complete{request.filter_chain}Seqs >= 10000"
+    chain_filter = request.chain_type  # Accept chain_type (sent by humanness.py)
+    if chain_filter:
+        if chain_filter not in ['Heavy', 'Light']:
+            raise HTTPException(status_code=400, detail="chain_type must be 'Heavy' or 'Light'")
+        filter_chain_statement = f"AND Complete{chain_filter}Seqs >= 10000"
+        count_query = f"SELECT COUNT(*) FROM subjects WHERE Complete{chain_filter}Seqs >= 10000"
     else:
         count_query = "SELECT COUNT(*) FROM subjects"
         
