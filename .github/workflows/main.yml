@@ -32,9 +32,8 @@ jobs:
             shaperon.azurecr.io/oasis-api:latest
           file: ./Dockerfile
 
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: biophioasisapi
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile }}
-          images: shaperon.azurecr.io/oasis-api:latest
+      - name: Trigger Azure Web App restart via webhook
+        run: |
+          curl -X POST "${{ secrets.AZURE_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            --fail --silent --show-error && echo "Webhook triggered successfully"
