@@ -72,4 +72,5 @@ def check_peptides(request: PeptideRequest):
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "db_path": OASIS_DB_PATH, "db_exists": os.path.exists(OASIS_DB_PATH)}
+    db_size = os.path.getsize(OASIS_DB_PATH) if os.path.exists(OASIS_DB_PATH) else 0
+    return {"status": "ok", "db_path": OASIS_DB_PATH, "db_exists": os.path.exists(OASIS_DB_PATH), "db_size_bytes": db_size}
