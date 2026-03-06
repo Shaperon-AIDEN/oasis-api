@@ -43,6 +43,5 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: "biophioasisapi"
-          slot-name: "production"
           publish-profile: ${{ secrets.AzureAppService_PublishProfile }}
           images: "shaperon.azurecr.io/oasis-api:${{ github.sha }}"
